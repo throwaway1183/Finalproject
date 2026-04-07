@@ -5,9 +5,11 @@ import os
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#list for "vocabulary.txt"
-file_dir=os.path.dirname(os.path.abspath(__file__))
+#list for "vocabulary.txt" and "chat.txt"
+file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 vocab_file_path=os.path.join(file_dir, "vocabulary.txt")
+output_file_path = os.path.join(file_dir, "chat.txt")
+out = open(output_file_path, "w", encoding="utf-8")
 words=[]
 with open(vocab_file_path, 'r', encoding='utf-8') as file:
     for line in file:
@@ -61,7 +63,7 @@ for k in range(noDays):
                 userPosting=random.choice(act[int(prevPostTime.hour/4)]+act[6])-1
         noSentences=random.randint(reply[userPosting][0],reply[userPosting][1])
         for i in range(noSentences):
-            print(prevPostTime.strftime("%d/%m/%y, %H:%M- "),userNames[userPosting],": ",sep="",end="")
+            out.write(prevPostTime.strftime("%d/%m/%y, %H:%M- ") + userNames[userPosting] + ": ")
             noWord=random.randint(1,maxPermittedWords[userPosting])
             toCAPS=(random.randint(1,100)%50)==0
             # user9 prefers CAPS sentences
@@ -70,10 +72,10 @@ for k in range(noDays):
             for j in range(noWord-1):
                 id=random.randint(0,len(words)-1)
                 if toCAPS:
-                    print(words[int(id)].upper(),sep=" ",end=" ")
+                    out.write(words[int(id)].upper() + " ")
                 else:
-                    print(words[int(id)],sep=" ",end=" ")
-            print(words[int(random.randint(0,len(words)-1))],end=".\n")
+                    out.write(words[int(id)] + " ")
+            out.write(words[int(random.randint(0,len(words)-1))] + ".\n")
             tmp=random.choice([0,0,0,0,0,0,1,1,1,2])
             # user7 is a slow typer
             if userPosting==6:
@@ -88,3 +90,4 @@ for k in range(noDays):
         prevUser=userPosting
     dayDifference=random.randint(1,maxPermittedDayGap)
     prevPostDate=prevPostDate+datetime.timedelta(days=dayDifference)
+out.close()
