@@ -1,36 +1,115 @@
 \documentclass[11pt,a4paper]{article}
 
-% Basic layout
+% Layout
 \usepackage[a4paper, margin=1in]{geometry}
 
-% packages
+% Packages
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{caption}
+\usepackage{listings}
 
-\title{Whatsapp Wrapped}
-\author{Tsewang Namgyal \\ 
-        Akshat Chaurasia}
+\title{WhatsApp Wrapped}
+\author{
+    Tsewang Namgyal \and Akshat Chaurasia\\
+    }
+\date{
+    CS108 Software Systems Lab Project Report 2025\\
+    Indian Institute of Technology, Bombay
+}
 \begin{document}
 
 \maketitle
-\tableofcontents
 
+\tableofcontents
 \newpage
 
-\begin{abstract}
-Once the report is completed, this section will be edited with a complete summary.
-\end{abstract}
-
 \section{Introduction}
-With the rise of messaging platforms like WhatsApp, group chats have become an important part of daily communication. These chats contain interesting patterns, such as who talks the most, how quickly people reply, and when they are most active. Studying these patterns can help us better understand group behavior and individual roles within conversations.
+With the rise of messaging platforms like WhatsApp, group chats have become an important part of daily communication. These chats contain interesting patterns, such as who talks the most, how quickly people reply, and when they are most active. Studying these patterns helps in understanding group behavior and individual roles within conversations.
 
-In this project, WhatsApp Group Wrapped, we build a system that analyzes and visualizes these patterns in a fun and interactive way, similar to Spotify Wrapped. First, a synthetic chat is generated using Python, where different users show realistic behaviors like varying activity levels and messaging styles. Then, the chat is analyzed to extract useful statistics about the group and its members.
+In this project, \textit{WhatsApp Wrapped}, we build a system that analyzes and visualizes these patterns in a format similar to Spotify Wrapped. First, a synthetic chat is generated using Python, where different users exhibit realistic behaviors such as varying activity levels and messaging styles. The generated chat is then analyzed to extract useful statistics about the group and its members.
 
-The results are stored in a JSON file and used by a browser-based application to create a slideshow of insights. Each slide highlights a specific statistic, and individual profile pages show detailed information for each user. Overall, this project combines data generation, analysis, and visualization to turn chat data into meaningful and engaging insights.
+The results are stored in a JSON file and used by a browser-based application to create a slideshow of insights.
 
-\section{System Design and Implementation Plan}
+\newpage
+\section{System Design and Implementation}
 
-\section{Week 1}
+\subsection{Implementation Plan}
+The system takes as input a comma-separated text file, \texttt{vocabulary.txt}, containing words and emojis.
+
+The script \texttt{chat.py} processes this vocabulary to simulate a group chat and generates an output file \texttt{chat.txt}. Distinct personalities and behavioral patterns are modeled using parameters such as:
+\begin{itemize}
+    \item Message frequency
+    \item Time gaps between messages
+    \item Message length
+    \item Reply streak patterns
+\end{itemize}
+
+The generated chat data is then processed by \texttt{analyze.py}, which computes statistical insights from \texttt{chat.txt} and outputs the results in JSON format.
+
+This JSON data is subsequently consumed by a browser-based application, where the results are presented as an interactive slideshow of insights.
+
+\subsection{System Architecture}
+
+\begin{itemize}
+\item This project depends on the following directory structure for proper functioning of code and organisation of files
+\end{itemize}
+
+\begin{lstlisting}[breaklines=true]
+whatsapp-wrapped/
+|-- generator/chat.py
+|-- parser/analyze.py
+|-- web/ (index.html, style.css, app.js, *.html, *.css, *.js)
+|-- chat.txt
+|-- data.json
+\-- vocabulary.txt
+\end{lstlisting}
+\captionof{figure}{Directory Structure}
+\begin{center}\end{center}
+
+\begin{itemize}
+\item The following pipeline is the sequence in which code execution takes place and results are generated
+\end{itemize}
+
+\begin{center}
+\texttt{
+vocabulary.txt $\rightarrow$ chat.py $\rightarrow$ chat.txt $\rightarrow$ analyze.py $\rightarrow$ data.json $\rightarrow$ app.js $\rightarrow$ Browser
+}
+\captionof{figure}{Pipeline}
+\end{center}
+
+
+\newpage
+\section{Chat Generation}
+\subsection{Overview}
+\begin{itemize}
+\item During this phase we initiated the implementation of \texttt{chat.py} and developed a working prototype. Given an input file \texttt{vocabulary.txt}, the system can now successfully simulate a group chat in the required format.
+\item The generated chat is written to \texttt{chat.txt}, which will serve as the input for subsequent analysis and visualization stages.
+\end{itemize}
+\subsection{Chat Generation Module}
+\begin{itemize}
+\item Requires a text file with comma-separated words which will be used to generate the simulated group chat. In this project we use \texttt{vocabulary.txt} 
+\item The output strictly follows the following format\\ 
+\texttt{DD/MM/YY, HH:MM - Sender\_Name: Message text}
+\item The generated chat is written to \texttt{chat.txt}, which will serve as the input for subsequent analysis and visualization stages.
+\begin{verbatim}
+Usage:
+    python3 chat.py
+\end{verbatim}
+\end{itemize}
+\subsection{Generation Illustration}
+
+\begin{itemize}
+    \item A sneak peek of chat.txt generated via chat.py\\\\
+    \texttt{22/03/26, 19:44- Prachit: taking.\\
+22/03/26, 20:59- Prachit: just cause institution activities hs help materials responsible sem cover concerns ncc basement had studies.\\
+22/03/26, 22:14- Bipul: built did.\\
+22/03/26, 23:29- Bipul: lot new can technology motorola css particularly js zero wot arguments experiments whatever his aptitude observation.\\
+22/03/26, 23:58- Chakri: practice ( reliant events max lot ips.\\
+22/03/26, 23:59- Chakri: lolol ssl tail graphics.\\
+23/03/26, 00:16- Aaryan: facilitated motorola message for also  the.\\
+23/03/26, 00:18- Aaryan: database anything answer extensions inputs; grading.}\\
+\end{itemize}
 
 \end{document}
