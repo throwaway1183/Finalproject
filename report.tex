@@ -10,6 +10,7 @@
 \usepackage{caption}
 \usepackage{listings}
 
+
 \title{WhatsApp Wrapped}
 \author{
     Tsewang Namgyal \and Akshat Chaurasia\\
@@ -78,9 +79,37 @@ vocabulary.txt $\rightarrow$ chat.py $\rightarrow$ chat.txt $\rightarrow$ analyz
 }
 \captionof{figure}{Pipeline}
 \end{center}
-
-
 \newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Chat Generation}
 \subsection{Overview}
 \begin{itemize}
@@ -92,10 +121,10 @@ vocabulary.txt $\rightarrow$ chat.py $\rightarrow$ chat.txt $\rightarrow$ analyz
 \item Requires a text file with comma-separated words which will be used to generate the simulated group chat. In this project we use \texttt{vocabulary.txt} 
 \item The output strictly follows the following format\\ 
 \texttt{DD/MM/YY, HH:MM - Sender\_Name: Message text}
-\item The generated chat is written to \texttt{chat.txt}, which will serve as the input for subsequent analysis and visualization stages.
+
 \begin{verbatim}
 Usage:
-    python3 chat.py
+    python3 chat.py <vocabulary.txt>
 \end{verbatim}
 \end{itemize}
 \subsection{Generation Illustration}
@@ -110,6 +139,337 @@ Usage:
 22/03/26, 23:59- Chakri: lolol ssl tail graphics.\\
 23/03/26, 00:16- Aaryan: facilitated motorola message for also  the.\\
 23/03/26, 00:18- Aaryan: database anything answer extensions inputs; grading.}\\
+\end{itemize}
+
+\subsection{Description of Features}
+\begin{itemize}
+    \item The chat simulates a group of 10 distinct users, each representing a unique participant in a WhatsApp-like environment.
+    
+    \item Each user is assigned a predefined personality profile that governs their messaging behaviour.
+    
+    \item The personality traits modeled in the system include:
+    \begin{itemize}
+        \item Variation in messaging frequency and preference for long or short messages
+        \item Nocturnal activity patterns (night owl behaviour)
+        \item Initiating conversations after long periods of inactivity
+        \item Short messages with high reply streaks to simulate rapid interactions
+        \item Typical or neutral participation behaviour
+        \item Slow typing behaviour leading to larger time gaps between messages
+        \item Preference for uppercase (CAPS) messages
+        \item Unpredictable or randomized interaction patterns
+    \end{itemize}
+    
+    \item Time-based controls are incorporated to ensure realistic simulation of conversations, including:
+    \begin{itemize}
+        \item Variable time gaps between consecutive messages
+        \item Day-wise progression with random inactivity gaps
+        \item Time-of-day dependent activity levels
+    \end{itemize}
+    
+    \item Message generation is vocabulary-driven, where each message is constructed using words sampled from \texttt{vocabulary.txt}.
+    
+    \item Reply streak behaviour is implemented to simulate bursts of messages from a single user within a short duration.
+    
+    \item Constraints such as preventing consecutive messages from the same user ensure realistic conversational flow.
+\end{itemize}
+
+\subsection{Modules Imported}
+\begin{itemize}
+    \item \texttt{numpy}
+    \begin{itemize}
+        \item Used for numerical operations and efficient handling of data.
+    \end{itemize}
+    
+    \item \texttt{sys}
+    \begin{itemize}
+        \item Used to accept command-line arguments.
+        \item Enables dynamic input of the vocabulary file path, improving flexibility of the script.
+    \end{itemize}
+    
+    \item \texttt{random}
+    \begin{itemize}
+        \item Used extensively to introduce stochastic behavior in the simulation.
+        \item Controls:
+        \begin{itemize}
+            \item User selection
+            \item Message length
+            \item Reply streak length
+            \item Time gaps between messages
+        \end{itemize}
+        \item Ensures that the generated chat mimics non-deterministic real-world interactions.
+    \end{itemize}
+    
+    \item \texttt{datetime}
+    \begin{itemize}
+        \item Used for handling dates and timestamps of messages.
+        \item Supports:
+        \begin{itemize}
+            \item Incrementing time between messages
+            \item Managing day transitions
+            \item Formatting timestamps in WhatsApp-like structure
+        \end{itemize}
+    \end{itemize}
+    
+    \item \texttt{os}
+    \begin{itemize}
+        \item Used for file path manipulation.
+        \item Ensures portability across different directory structures and operating systems.
+        \item Helps locate input and output files relative to the project directory.
+    \end{itemize}
+\end{itemize}
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Statistics Parser}
+
+\subsection{Overview}
+\begin{itemize}
+\item During this phase we implemented \texttt{analyze.py}, which processes the generated chat data and extracts meaningful statistical insights.
+\item The parser reads \texttt{chat.txt} and produces a structured output file \texttt{data.json}, which is used for visualization in later stages.
+\end{itemize}
+
+\subsection{Statistics Parser Module}
+\begin{itemize}
+\item Requires the path of chat file \texttt{chat.txt} as command line input.
+\item Parses each message to extract:
+\begin{itemize}
+    \item Date
+    \item Time
+    \item Sender name
+    \item Message content
+\end{itemize}
+
+\begin{verbatim}
+Usage:
+    python3 analyze.py <chat.txt>
+\end{verbatim}
+\end{itemize}
+
+\subsection{Description of Features}
+\begin{itemize}
+    \item The parser computes multiple categories of statistics to capture different aspects of chat behaviour.
+
+    \item \textbf{User-based statistics:}
+    \begin{itemize}
+        \item Total number of messages sent by each user
+        \item Total number of words sent by each user
+        \item Top 3 emojis used by each user
+        \item Number of long messages, CAPS messages, and long words per user
+    \end{itemize}
+
+    \item \textbf{Group-based statistics:}
+    \begin{itemize}
+        \item Most active users during late-night hours (12 AM -- 4 AM)
+        \item Users receiving the least number of direct replies (ghost users)
+        \item Users who frequently break long silence periods
+        \item Users with the fastest average reply time
+    \end{itemize}
+
+    \item \textbf{Time-based statistics:}
+    \begin{itemize}
+        \item Busiest days based on total message count
+        \item Most chaotic days based on number of replies
+        \item Longest inactivity gap in the chat
+        \item Median reply time across all users
+    \end{itemize}
+
+    \item \textbf{Word-based statistics:}
+    \begin{itemize}
+        \item Most frequently used words in the chat
+        \item Distribution of activity across different time intervals
+    \end{itemize}
+
+    \item Reply behaviour is modeled using time differences between consecutive messages, allowing classification into replies and non-replies.
+
+    \item Silence detection is incorporated by identifying large time gaps between messages, enabling tracking of inactivity periods and silence-breaking events.
+
+    \item All computed statistics are aggregated and stored in structured dictionaries before being written to \texttt{data.json}.
+\end{itemize}
+
+\subsection{Custom Statistics and Motivation}
+\begin{itemize}
+    \item In addition to the predefined statistics (1--10), the parser introduces several custom statistics (11--17) to capture deeper behavioral patterns in chat interactions.
+
+    \item \textbf{Chaotic Day (11):}
+    \begin{itemize}
+        \item Defined as the day with the highest number of direct replies.
+        \item This metric captures conversational intensity rather than just volume, highlighting days with highly interactive discussions.
+    \end{itemize}
+
+    \item \textbf{Long Message User (12):}
+    \begin{itemize}
+        \item Identifies users who send the most messages containing at least 10 words.
+        \item This helps distinguish users who contribute detailed or information-rich messages from those who send short replies.
+    \end{itemize}
+
+    \item \textbf{Emoji User (13):}
+    \begin{itemize}
+        \item Distinguishes users based on the total number of emojis used.
+        \item This statistic reflects expressiveness and emotional tone in communication.
+    \end{itemize}
+
+    \item \textbf{CAPS User (14):}
+    \begin{itemize}
+        \item Counts the number of messages written entirely in uppercase.
+        \item This is used as a proxy for emphasis, urgency, or strong emotional expression.
+    \end{itemize}
+
+    \item \textbf{Long Word User (15):}
+    \begin{itemize}
+        \item Identifies the user with the most number of words with length at least $10$ characters.
+        \item This serves as an approximate indicator of vocabulary complexity or formality.
+    \end{itemize}
+
+    \item \textbf{Most Common Words (16):}
+    \begin{itemize}
+        \item Computes the most frequently used words across the chat, along with their temporal distribution.
+        \item This helps identify dominant topics and how language usage varies over time.
+    \end{itemize}
+
+    \item \textbf{Peak Active Hour (17):}
+    \begin{itemize}
+        \item Determines activity levels across predefined 6 time intervals of 4 hours in a day.
+        \item This provides insight into when users are most active, enabling temporal pattern analysis.
+    \end{itemize}
+
+    \item Overall, these custom statistics were chosen to complement the predefined metrics by incorporating \textbf{message quality, expressiveness, interaction intensity, and temporal behavior}, resulting in a more comprehensive analysis of chat dynamics.
+\end{itemize}
+
+\subsection{Parser Definition Choices and Justification}
+\begin{itemize}
+    \item \textbf{Definition of a Reply:}
+    \begin{itemize}
+        \item A message is considered a reply if it is sent by a different user than the previous message sender.
+        \item If the time difference between consecutive messages is less than 600 seconds, it is classified as a quick reply, which is always a direct reply.
+        \item For larger time gaps, a reply is considered a direct reply probabilistically with a 50\% chance.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item Chat datasets do not explicitly encode reply relationships.
+        \item A strict time-based threshold alone is insufficient, as conversations may resume after delays.
+        \item The probabilistic component avoids overly rigid assumptions and better approximates real conversational flow.
+    \end{itemize}
+
+    \item \textbf{Definition of Silence:}
+    \begin{itemize}
+        \item Silence is defined as a time gap greater than 1800 seconds (30 minutes) between consecutive messages.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item This threshold distinguishes normal conversational pauses from meaningful inactivity.
+        \item It enables identification of silence-breaking behavior and computation of the longest inactivity period.
+    \end{itemize}
+
+    \item \textbf{Definition of Direct Reply Count (for \texttt{ghost}):}
+    \begin{itemize}
+        \item A direct reply is counted when a user's message is followed by another user's reply under the reply rules defined above.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item This provides a measurable proxy for user engagement and interaction received from others.
+    \end{itemize}
+
+    \item \textbf{Definition of Long Message:}
+    \begin{itemize}
+        \item A message containing at least 10 words is classified as a long message.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item This threshold separates short conversational replies from more detailed contributions.
+    \end{itemize}
+
+    \item \textbf{Definition of CAPS Message:}
+    \begin{itemize}
+        \item A message is classified as a CAPS message if all characters are uppercase.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item CAPS messages often indicate emphasis or strong emotion, making them useful for behavioral analysis.
+    \end{itemize}
+
+    \item \textbf{Definition of Long Word:}
+    \begin{itemize}
+        \item Words with length greater than or equal to 10 characters are considered long words.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item This serves as a simple proxy for vocabulary complexity.
+    \end{itemize}
+
+    \item \textbf{Time Interval Bucketing:}
+    \begin{itemize}
+        \item The day is divided into six 4-hour intervals to compute activity distributions.
+    \end{itemize}
+
+    \item \textbf{Justification:}
+    \begin{itemize}
+        \item This provides a balance between granularity and interpretability when analyzing temporal patterns.
+    \end{itemize}
+
+    \item All definitions are designed to be simple, consistent, and computationally efficient, while still capturing meaningful conversational behavior from raw chat data.
+\end{itemize}
+
+\subsection{Modules Imported}
+\begin{itemize}
+    \item \texttt{random}
+    \begin{itemize}
+        \item Used for probabilistic modeling of reply behaviour (e.g., random direct reply assignment).
+    \end{itemize}
+
+    \item \texttt{emoji}
+    \begin{itemize}
+        \item Used to detect and process emojis in messages.
+        \item Enables computation of emoji-based statistics.
+    \end{itemize}
+
+    \item \texttt{datetime}
+    \begin{itemize}
+        \item Used to compute time differences between messages.
+        \item Helps in identifying replies, silence periods, and activity patterns.
+    \end{itemize}
+
+    \item \texttt{json}
+    \begin{itemize}
+        \item Used to store computed statistics in a structured JSON format.
+        \item Facilitates easy integration with the frontend visualization module.
+    \end{itemize}
+
+    \item \texttt{os}
+    \begin{itemize}
+        \item Used for handling file paths and ensuring correct input/output file access.
+    \end{itemize}
 \end{itemize}
 
 \end{document}
