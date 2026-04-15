@@ -4,22 +4,84 @@
   <meta charset="UTF-8">
   <title>WhatsApp Wrapped</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- Background Layers -->
-<canvas id="bg-canvas"></canvas>
-<div id="blob-container"></div>
+<video autoplay muted loop id="bgVideo0">
+  <source src="a.mp4" type="video/mp4">
+</video>
+<video  muted loop id="bgVideo1">
+  <source src="a1.mp4" type="video/mp4">
+</video>
+<video  muted loop id="bgVideo2">
+  <source src="a2.mp4" type="video/mp4">
+</video>
+<video  muted loop id="bgVideo3"> 
+  <source src="a3.mp4" type="video/mp4">
+</video>
+<video  muted loop id="bgVideo4">   
+  <source src="a4.mp4" type="video/mp4">
+</video>
 
-<!-- App -->
-<div id="app">
-  <div id="slide-container"></div>
-
-  <div id="profile-selector">
-    <h3>Profiles</h3>
-    <div id="profile-list"></div>
-  </div>
+<div class="topbar">
+    <button id="toggleBtn">☰</button>
+    <h2>WhatsApp Wrapped</h2>
 </div>
+
+
+<div class="app" >
+
+  <div class="wipe"></div>
+  <div class="wipe two"></div>
+
+  <aside class="sidebar closed">
+    <nav>
+      <div class="section-title">User Statistics</div>
+      <div class="nav-item" data-index = "0">Total Messages</div>
+      <div class="nav-item" data-index = "1">Total Words</div>
+      <div class="nav-item" data-index = "2">Most Used Emoji</div>
+
+      <hr>
+
+      <div class="section-title">Group Statistics</div>
+      <div class="nav-item" data-index = "3">Night Owl</div>
+      <div class="nav-item" data-index = "4">Ghost</div>
+      <div class="nav-item" data-index = "5">Conversation Starter</div>
+      <div class="nav-item" data-index = "6">Hype Person</div>
+      <div class="nav-item" data-index = "7">The CAPS user</div>
+      <div class="nav-item" data-index = "8">Long Worder</div>
+      <div class="nav-item" data-index = "9">Long Messenger</div>
+      <div class="nav-item" data-index = "10">Emoji Man</div>
+      <div class="nav-item" data-index = "11">Most Common Word</div>
+
+      <hr>
+
+      <div class="section-title">Time Statistics</div>
+      <div class="nav-item" data-index = "12">Busiest Day</div>
+      <div class="nav-item" data-index = "13">Longest Silence</div>
+      <div class="nav-item" data-index = "14">Most Chaotic Day</div>
+      <div class="nav-item" data-index = "15">Average Response Time</div>
+      <div class="nav-item" data-index = "16">Peak Activity</div>
+
+      <hr>
+
+      <div class="section-title">Per Person Statistics</div>
+        <div class="nav-item" data-index = "17">Checkout Per Person statistics</div>
+
+    </nav>
+  </aside>
+    <div class="content">
+      <div class="intro">
+        <h1>WhatsApp Wrapped</h1>
+        <p>Discover your WhatsApp usage analytics</p>
+        <p1>Click to explore your stats</p1>
+      </div>
+    </div>
+    <div id="emojiGraphContainer" class="emoji-graph hidden"></div>
+</div>
+
 
 <script src="app.js"></script>
 </body>

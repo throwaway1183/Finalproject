@@ -1,289 +1,218 @@
-let slides = [];
-let currentSlide = 0;
-let data = null;
-let selectedProfiles = new Set();
+console.log("JS LOADED");
+const toggleBtn = document.getElementById('toggleBtn');
+const sidebar = document.querySelector('.sidebar');
 
-/* ---------------- MOCK DATA ---------------- */
-function loadData() {
-  data = {
-    group: {
-      total_messages: { Alice: 120, Bob: 90, Charlie: 200 },
-      total_words: { Alice: 1000, Bob: 850, Charlie: 1500 },
-      night_owl: "Charlie",
-      night_owl_avg_time: "2:30 AM - 4:00 AM",
-      ghost: "Bob",
-      ghost_max_consecutive: 15,
-      conversation_starter: "Alice",
-      busiest_day: "12/03/26",
-      longest_silence: "2 days",
-      hype_person: "Charlie"
-    },
-    people: {
-      Alice: { total_messages: 120, total_words: 1000, avg_response_time: 5, most_used_emoji: ["😂","🔥","😭"], activity: { '00:00': 5, '06:00': 10, '12:00': 20, '18:00': 15, '23:00': 8 } },
-      Bob: { total_messages: 90, total_words: 850, avg_response_time: 8, most_used_emoji: ["🤣","😎","👍"], activity: { '01:00': 3, '07:00': 8, '13:00': 15, '19:00': 12, '22:00': 6 } },
-      Charlie: { total_messages: 200, total_words: 1500, avg_response_time: 2, most_used_emoji: ["🔥","💀","😂"], activity: { '02:00': 10, '08:00': 25, '14:00': 30, '20:00': 20, '23:59': 15 } }
-    }
-  };
-
-  init();
-}
-
-/* ---------------- INIT ---------------- */
-function init() {
-  buildSlides();
-  buildProfiles();
-  showSlide(0);
-  initBlobs();
-  initParticles();
-  initMouseTracking();
-}
-
-/* ---------------- SLIDES ---------------- */
-function buildSlides() {
-  const container = document.getElementById("slide-container");
-  slides = [];
-
-  slides.push(createSlide(`<h1>📱 WhatsApp Wrapped</h1>`, true));
-  slides.push(createSlide(renderChart("Messages", data.group.total_messages)));
-  slides.push(createSlide(renderChart("Words", data.group.total_words)));
-
-  slides.push(createSlide(`<h1>🌙 Night Owl</h1><div class="stat primary">${data.group.night_owl}</div><div class="stat secondary">Avg active: ${data.group.night_owl_avg_time}</div>`));
-  slides.push(createSlide(`<h1>👻 Ghost</h1><div class="stat primary">${data.group.ghost}</div><div class="stat secondary">Max consecutive: ${data.group.ghost_max_consecutive} msgs</div>`));
-
-  slides.push(createSlide(`<h1>Profiles</h1><div id="profiles-content"></div>`, false, "profile-slide"));
-
-  container.innerHTML = "";
-  slides.forEach(s => container.appendChild(s));
-}
-
-function createSlide(content, isIntro = false, extraClass = "") {
-  const div = document.createElement("div");
-  div.className = "slide";
-  if (isIntro) div.classList.add("intro-slide");
-  if (extraClass) div.classList.add(extraClass);
-  div.innerHTML = content;
-  return div;
-}
-
-function showSlide(i) {
-  const prevSlide = slides[currentSlide];
-  if (prevSlide) {
-    // Make fade-out instant by temporarily disabling transition before hiding
-    prevSlide.style.transition = "none";
-    prevSlide.classList.remove("active");
-    // Force reflow so the style change takes effect immediately
-    void prevSlide.offsetWidth;
-    prevSlide.style.transition = "";
-  }
-
-  slides[i].classList.add("active");
-
-  // Populate profiles content if needed
-  const profilesContent = slides[i].querySelector('#profiles-content');
-  if (profilesContent && !profilesContent.innerHTML) {
-    profilesContent.innerHTML = renderProfiles();
-  }
-
-  // Show/hide profile selector
-  const selector = document.getElementById('profile-selector');
-  if (slides[i].classList.contains('profile-slide')) {
-    selector.style.display = 'block';
-  } else {
-    selector.style.display = 'none';
-  }
-
-  animateBars();
-
-  currentSlide = i;
-}
-
-/* ---------------- CHART ---------------- */
-function renderChart(title, obj) {
-  let html = `<h1>${title}</h1><div class="chart">`;
-
-  const max = Math.max(...Object.values(obj));
-
-  Object.entries(obj).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => {
-    const width = (v / max) * 100;
-
-    html += `
-      <div class="bar-row">
-        <div class="bar-label">
-          <span>${k}</span>
-          <span>${v}</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill" data-width="${width}%"></div>
-        </div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  return html;
-}
-
-function animateBars() {
-  setTimeout(() => {
-    document.querySelectorAll(".bar-fill").forEach(b => {
-      b.style.width = b.dataset.width;
-    });
-    document.querySelectorAll(".activity-fill").forEach(b => {
-      b.style.height = b.dataset.height;
-    });
-  }, 100);
-}
-
-function renderActivity(activity, delay) {
-  let html = `<div class="activity-chart" style="animation-delay: ${delay}s;">`;
-
-  const entries = Object.entries(activity).sort(([a], [b]) => a.localeCompare(b));
-
-  const max = Math.max(...entries.map(([,v]) => v));
-
-  entries.forEach(([hour, v]) => {
-    const height = max > 0 ? (v / max) * 100 : 0;
-
-    html += `
-      <div class="activity-bar-container">
-        <div class="activity-value">${v}</div>
-        <div class="activity-bar">
-          <div class="activity-fill" data-height="${height}%"></div>
-        </div>
-        <div class="activity-label">${hour}</div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  return html;
-}
-
-function renderProfiles() {
-  let html = '';
-
-  selectedProfiles.forEach((name, index) => {
-    const p = data.people[name];
-    const delay = 0.5 + index * 0.2;
-
-    html += `
-      <div class="stat" style="animation-delay: ${delay}s;">
-        <h2>${name}</h2>
-        ${p.total_messages} msgs<br>
-        ${p.total_words} words<br>
-        ⏱ ${p.avg_response_time} min<br>
-        ${p.most_used_emoji.join(" ")}
-      </div>
-      ${renderActivity(p.activity, delay + 0.5)}
-    `;
-  });
-
-  return html;
-}
-
-/* ---------------- PROFILES ---------------- */
-function buildProfiles() {
-  const list = document.getElementById("profile-list");
-
-  Object.keys(data.people).forEach(name => {
-    const label = document.createElement("label");
-    const cb = document.createElement("input");
-
-    cb.type = "checkbox";
-    cb.checked = true; // default selected
-    selectedProfiles.add(name);
-
-    cb.onchange = () => {
-      cb.checked ? selectedProfiles.add(name) : selectedProfiles.delete(name);
-      // Update the profiles slide content
-      const contentDiv = document.getElementById('profiles-content');
-      if (contentDiv) {
-        contentDiv.innerHTML = renderProfiles();
-        animateBars();
-      }
-    };
-
-    label.appendChild(cb);
-    label.append(name);
-    list.appendChild(label);
-  });
-}
-function initBlobs() {
-  const container = document.getElementById("blob-container");
-
-  for (let i = 0; i < 5; i++) {
-    const blob = document.createElement("div");
-    blob.className = "blob";
-
-    blob.style.width = blob.style.height = (200 + Math.random() * 200) + "px";
-    blob.style.left = Math.random() * 100 + "%";
-    blob.style.top = Math.random() * 100 + "%";
-    blob.style.background = `hsl(${Math.random()*360},70%,60%)`;
-    blob.style.animationDuration = (10 + Math.random() * 20) + "s";
-
-    container.appendChild(blob);
-  }
-}
-
-/* ---------------- PARTICLES ---------------- */
-function initParticles() {
-  const canvas = document.getElementById("bg-canvas");
-  const ctx = canvas.getContext("2d");
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  let particles = Array.from({length: 60}, () => ({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    dx: (Math.random()-0.5),
-    dy: (Math.random()-0.5),
-    r: Math.random()*2
-  }));
-
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    particles.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.fill();
-    });
-
-    requestAnimationFrame(draw);
-  }
-
-  draw();
-}
-
-/* ---------------- MOUSE TRACKING ---------------- */
-function initMouseTracking() {
-  const blobs = document.querySelectorAll(".blob");
-  document.addEventListener("mousemove", (e) => {
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
-    blobs.forEach((blob, i) => {
-      const offsetX = (x - 0.5) * 50 * (i + 1);
-      const offsetY = (y - 0.5) * 50 * (i + 1);
-      blob.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-    });
-  });
-}
-
-/* ---------------- START ---------------- */
-loadData();
-
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#profile-selector')) {
-    const isRightSide = e.clientX > window.innerWidth / 2;
-    if (isRightSide) {
-      showSlide((currentSlide + 1) % slides.length);
-    } else {
-      showSlide((currentSlide - 1 + slides.length) % slides.length);
-    }
-  }
+toggleBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('closed');
 });
+
+
+let currentIndex = -1;
+let totalSlides = 18;
+let isAnimating = false;
+
+const content = document.querySelector('.content');
+const navItems = document.querySelectorAll('.nav-item');
+const wipe = document.querySelector(".wipe");
+const wipeTwo = document.querySelector('.wipe.two');
+
+let data = []; // global variable to hold data
+
+async function loadData() {
+  const response = await fetch("./data.json");
+  return await response.json();
+}
+
+let slides = []; // empty initially
+
+async function init() {
+  const cdata = await loadData();
+  data = cdata; // assign to global variable
+  // build slides after data is ready
+ 
+  const maxIndex = data.activity.indexOf(Math.max(...data.activity));
+  const timeRanges = [
+    ["12:00 AM", "4:00 AM"],
+    ["4:00 AM", "8:00 AM"],
+    ["8:00 AM", "12:00 PM"],
+    ["12:00 PM", "4:00 PM"],
+    ["4:00 PM", "8:00 PM"],
+    ["8:00 PM", "12:00 AM"]
+  ];
+  const [lt, rt] = timeRanges[maxIndex];   
+
+  slides = [
+    //user stats
+    `<h1>Total Messages</h1><p>12,847 messages sent</p>`,                   
+    `<h1>Total Words</h1><p>98,231 words typed</p>`,                        
+    `<h1>Most Used Emoji</h1><p>😂 (1,204 times)</p>`,                      
+    //group stats
+    `<h1>Night Owl</h1><p>${cdata.nightOwl[0][0]} : most active after midnight 🌙</p>`,        
+    `<h1>Ghost</h1><p>${cdata.ghost[0][0]} : ghosted 👻</p>`,                    
+    `<h1>Conversation Starter</h1><p>${cdata.silenceBreaker[0][0]} : starts the most chats 💬</p>`, 
+    `<h1>Hype Person</h1><p>${cdata.fastReplier[0][0]} : always reacting 🔥</p>`,               
+    `<h1>The CAPS User</h1><p>${cdata.CAPSer[0][0]} : LOVES SHOUTING 😤</p>`,               
+    `<h1>Long Worder</h1><p>${cdata.longWorder[0][0]} : longest average word length 📚</p>`,   
+    `<h1>Long Messenger</h1><p>${cdata.longMessager[0][0]} : longest messages ✍️</p>`,           
+    `<h1>Emoji Man</h1><p>${cdata.emojiUser[0][0]} : most emojis used 😂🔥💀</p>`,              
+    `<h1>Most Common Word</h1><p>"${cdata.top5Words[0][0][0]}" (used ${cdata.top5Words[0][0][1]} times)</p>`,               
+    //time stats
+    `<h1>Busiest Day</h1><p>${cdata.top3BusyDay[0][0]} : ${cdata.top3BusyDay[0][1]} messages 📈</p>`,              
+    `<h1>Longest Silence</h1><p>${Math.floor(cdata.longestSilence / 3600)} hours 😶</p>`,                    
+    `<h1>Most Chaotic Day</h1><p>${cdata.top3ChaoticDay[0][0]} : nonstop chaos 💥</p>`,           
+    `<h1>Average Response Time</h1><p>${Math.floor(cdata.medianReplyTime / 60)} minutes : ${cdata.medianReplyTime % 60} seconds ⏱️</p>`,                       
+    `<h1>Peak Activity</h1><p>${lt} - ${rt} 🌆</p>` 
+  ];
+}
+
+init();
+
+// Add click event listeners to navigation items
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const index = Number(item.getAttribute('data-index'));
+    loadSlideFancy(index);
+    navItems.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  })
+});
+
+//emoji graph
+const container = document.getElementById('emojiGraphContainer');
+
+function decodeEmoji(unicodeStr) {
+  const hex = unicodeStr.replace("\\U", "");
+  return String.fromCodePoint(parseInt(hex, 16));
+}
+
+function renderEmojiGraph(){
+  container.innerHTML = "<h1>Top 3 Emojis Per User</h1>"; 
+  let firstBlock = document.createElement("div");
+  firstBlock.style.display = "flex";
+  firstBlock.style.flexDirection = "column";
+  let secondBlock = document.createElement("div");
+  secondBlock.style.display = "flex";
+  secondBlock.style.flexDirection = "column";
+  const users = data.userName;
+  const emojiData = data.top3Emojis;
+  users.forEach((user, i) => {
+    const personDiv = document.createElement("div");
+    personDiv.className = "person-block";
+
+    const name = document.createElement("div");
+    name.className = "person-name";
+    name.textContent = user;
+    personDiv.appendChild(name);
+    const max = emojiData[i][0][1];
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    let cnt = 0;
+     emojiData[i].forEach(
+       ([emoji, count]) => {
+         const bar = document.createElement("div");
+         bar.className = "bar" + cnt;
+         cnt++;
+         bar.textContent = count + " " + decodeEmoji(emoji);
+         bar.style.width = `${(count / max) * 200}px`;
+         row.appendChild(bar);
+      }
+    );
+    personDiv.appendChild(row);
+    if(i < 5){
+    firstBlock.appendChild(personDiv);
+    } else{
+      secondBlock.appendChild(personDiv);
+    }
+  });
+  let thirdBlock = document.createElement("div");
+  thirdBlock.style.display = "flex";
+  thirdBlock.appendChild(firstBlock);
+  thirdBlock.appendChild(secondBlock);
+  firstBlock.style.padding = "10px 50px";
+  secondBlock.style.padding = "10px 50px";
+  container.appendChild(thirdBlock);
+}
+
+let curvid = 0;
+let numvid = 4;
+
+
+//slide loader logic
+function showSlide(index){
+  console.log("showSlide:", index);
+  if(index === currentIndex) return;
+  let prev = curvid;
+  curvid = (curvid % numvid) + 1;
+  let prevVid = document.getElementById("bgVideo" + prev);
+  let nextVid = document.getElementById("bgVideo" + curvid);
+  nextVid.playbackRate = 1.3;
+  nextVid.loop = false;
+  nextVid.play();
+  nextVid.style.opacity = 1;
+  nextVid.style.zIndex = -1;
+  prevVid.style.opacity = 0;
+  prevVid.style.zIndex = -2;
+  if (prevVid.readyState >= 1) {
+    prevVid.currentTime = 0;
+  }
+  prevVid.pause();
+
+  if(index === 2){
+    content.innerHTML = "";                 
+    container.classList.remove("hidden");  
+    renderEmojiGraph();
+  } else {
+    container.classList.add("hidden");      
+    content.innerHTML = slides[index];      
+  }
+  currentIndex = index;
+}
+
+
+
+function loadSlideFancy(index) {
+  if(index === currentIndex){
+    return;
+  }
+  if(isAnimating){
+    return;
+  }
+  isAnimating = true;
+  if(currentIndex != -1){
+    wipe.style.transition = "right 0.5s ease;";
+    wipeTwo.style.transition = "left 0.5s ease;";
+    showSlide(index);
+      setTimeout(() => {
+      isAnimating = false;
+    }, 2000);
+}else{
+    wipe.classList.add("active");
+    wipeTwo.classList.add("active");
+    wipe.style.transition = "right 1s ease;";
+    wipeTwo.style.transition = "left 1s ease;";
+    setTimeout(() => {
+      showSlide(index);
+    }, 1500);
+
+    setTimeout(() => {
+      wipe.classList.remove("active");
+      wipeTwo.classList.remove("active");
+    }, 2000);
+
+    setTimeout(() => {
+      wipe.classList.remove("active");
+      wipeTwo.classList.remove("active");
+      isAnimating = false;
+    }, 3000);
+  } 
+  navItems.forEach(i => i.classList.remove('active'));
+  navItems[index].classList.add('active');
+}
+
+
+document.addEventListener('click', (event) => {
+  if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+      loadSlideFancy((currentIndex + 1) % totalSlides);
+    }
+  }
+)
