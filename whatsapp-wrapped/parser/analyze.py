@@ -25,13 +25,13 @@
 # 17-> peak active hour
 
 # Import useful libraries
-import numpy
 import random
 import emoji
 import datetime
 import json
 import os
 
+# File path for "chat.txt" and "data.json"
 file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 input_file_path = os.path.join(file_dir, "chat.txt")
 output_file_path = os.path.join(file_dir, "data.json")
@@ -225,11 +225,13 @@ for value in userData.values():
     tmpEmojiDict=dict(sorted(value[5].items(), key=lambda i: -i[1]))
     value[5]=tmpEmojiDict
 
+# Preparing final_dict as per the below keyList for exporting as json 
 final_dict={}
 keyList=["userName","messageCount","wordCount","top3Emojis","nightOwl","ghost","silenceBreaker","fastReplier","longMessager","emojiUser","CAPSer","longWorder","top3BusyDay","top3ChaoticDay","longestSilence","medianReplyTime","top5Words","activity"]
 
 for key in keyList:
     final_dict[key]=[]
+# Adding user data to final_dict
 for key, value in userData.items():
     final_dict["userName"].append(key)
     final_dict["messageCount"].append(value[0])
@@ -243,6 +245,7 @@ for key, value in userData.items():
         emojiCnt+=1
     final_dict["top3Emojis"].append(tmpEmojiList)
 
+# Adding user group statistics to final_dict
 tmpRanking=[[] for i in range(8)]
 cnt=0
 for value in userData.values():
@@ -270,6 +273,7 @@ final_dict["emojiUser"]=[[final_dict["userName"][j], -i] for i,j in tmpRanking[5
 final_dict["CAPSer"]=[[final_dict["userName"][j], -i] for i,j in tmpRanking[6]]
 final_dict["longWorder"]=[[final_dict["userName"][j], -i] for i,j in tmpRanking[7]]
 
+# Adding day data to final_dict
 tmpRanking=[[] for i in range(2)]
 for key, value in dayData.items():
     tmpRanking[0].append([value[0],key])
@@ -280,6 +284,7 @@ for i in tmpRanking:
 final_dict["top3BusyDay"]=[[j,i] for i,j in tmpRanking[0][:3]]
 final_dict["top3ChaoticDay"]=[[j,i] for i,j in tmpRanking[1][:3]]
 
+# Adding word data to final_dict
 replyTime.sort()
 tmpRanking=[[] for i in range(7)]
 for key, value in wordData.items():
@@ -298,5 +303,6 @@ final_dict["medianReplyTime"]=replyTime[int(len(replyTime)/2)]
 final_dict["top5Words"]=[[[j,i] for i,j in tmpRanking[k][:5]] for k in range(7)]
 final_dict["activity"]=activiy
 
+# Exporting final_dict as json
 with open(output_file_path, "w", encoding="utf-8") as f:
    json.dump(final_dict, f)

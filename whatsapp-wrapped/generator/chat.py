@@ -1,4 +1,6 @@
 #importing useful modules
+import sys
+import numpy as np
 import random
 import datetime
 import os
@@ -7,7 +9,7 @@ import os
 
 #list for "vocabulary.txt" and "chat.txt"
 file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-vocab_file_path=os.path.join(file_dir, "vocabulary.txt")
+vocab_file_path=sys.argv[1]
 output_file_path = os.path.join(file_dir, "chat.txt")
 out = open(output_file_path, "w", encoding="utf-8")
 words=[]
@@ -19,16 +21,16 @@ with open(vocab_file_path, 'r', encoding='utf-8') as file:
 
 #list of users in the group
 noUsers=10
-users=["User1","User2","User3","User4","User5","User6","User7","User8","User9","User10"]
-userNames=["Prachit","Bipul","Aaryan","Kshitij","Balaji","Chakri","Ujjwal","Bharat","Himanshu","Safwan"]
-personalities=["very large no of messages","prefers longer sentences","night owl","starts conversation after long silence","short sentences and high reply streak","normal group member","slow typer","normal group member","prefers CAPS sentences","unpredictable/randomised group member"]
+users=np.array(["User1","User2","User3","User4","User5","User6","User7","User8","User9","User10"], dtype="S")
+userNames=np.array(["Prachit","Bipul","Aaryan","Kshitij","Balaji","Chakri","Ujjwal","Bharat","Himanshu","Safwan"], dtype="S")
+personalities=np.array(["very large no of messages","prefers longer sentences","night owl","starts conversation after long silence","short sentences and high reply streak","normal group member","slow typer","normal group member","prefers CAPS sentences","unpredictable/randomised group member"], dtype="S")
 
 # time contols of the group chat
 chatStartDate=datetime.date(2026,3,22)
 maxPermittedDayGap=5
 permittedTimeGap=[(1,600),(601,1800),(1801,7200)]
 maxPermittedMessages=100
-maxPermittedWords=[15,23,7,7,5,10,10,10,10,13]
+maxPermittedWords=[15,23,7,7,5,10,10,10,10,13] 
 
 # activity lists for 00-04,04-08,08-12,12-16,16-20,20-24,long silence
 act=[
@@ -42,15 +44,15 @@ act=[
 ]
 longSilence=False
 # reply streaks in format (min,max)
-reply=[(2,7),(1,3),(2,3),(2,4),(4,9),(1,3),(2,4),(1,5),(2,5),(1,4)]
+reply=np.array([(2,7),(1,3),(2,3),(2,4),(4,9),(1,3),(2,4),(1,5),(2,5),(1,4)], dtype="int16")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # chat.py to generate group chat
-noDays=120
+loopCounter=120
 prevPostDate=chatStartDate
 prevUser=-1
-for k in range(noDays):
+for k in range(loopCounter):
     prevPostTime=datetime.datetime.combine(prevPostDate,datetime.time(random.randint(0,23),random.randint(0,59),random.randint(0,59)))
     noMessages=random.randint(1,maxPermittedMessages)
     for l in range(noMessages):
@@ -63,7 +65,7 @@ for k in range(noDays):
                 userPosting=random.choice(act[int(prevPostTime.hour/4)]+act[6])-1
         noSentences=random.randint(reply[userPosting][0],reply[userPosting][1])
         for i in range(noSentences):
-            out.write(prevPostTime.strftime("%d/%m/%y, %H:%M- ") + userNames[userPosting] + ": ")
+            out.write(prevPostTime.strftime("%d/%m/%y, %H:%M- ") + (userNames[userPosting]).decode("utf-8") + ": ")
             noWord=random.randint(1,maxPermittedWords[userPosting])
             toCAPS=(random.randint(1,100)%50)==0
             # user9 prefers CAPS sentences
@@ -75,7 +77,10 @@ for k in range(noDays):
                     out.write(words[int(id)].upper() + " ")
                 else:
                     out.write(words[int(id)] + " ")
-            out.write(words[int(random.randint(0,len(words)-1))] + ".\n")
+            if toCAPS:
+                out.write(words[int(random.randint(0,len(words)-1))].upper() + ".\n")
+            else:
+                out.write(words[int(random.randint(0,len(words)-1))] + ".\n")
             tmp=random.choice([0,0,0,0,0,0,1,1,1,2])
             # user7 is a slow typer
             if userPosting==6:
