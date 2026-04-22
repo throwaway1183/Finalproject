@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>WhatsApp Wrapped</title>
+  <link rel="icon" type="image/x-icon" href="/images/whatsapp_logo.png">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
+
 <body>
 
 <video autoplay muted loop id="bgVideo0">
@@ -28,11 +29,11 @@
 <div class="topbar">
     <button id="toggleBtn">☰</button>
     <h2>WhatsApp Wrapped</h2>
+    <button id="personToggle">☰</button>
 </div>
 
 
 <div class="app" >
-
   <div class="wipe"></div>
   <div class="wipe two"></div>
 
@@ -69,20 +70,46 @@
 
       <div class="section-title">Per Person Statistics</div>
         <div class="nav-item" data-index = "17">Checkout Per Person statistics</div>
+    </nav>
+  </aside>  
 
+  <div class="content">
+    <div class="intro">
+      <h1>WhatsApp Wrapped</h1>
+      <p>Discover your WhatsApp usage analytics</p>
+      <p1>Click to explore your stats</p1>
+    </div>
+  </div>
+  <div class="perPersonContent">
+      <div id="profileContainer" class="hidden">
+    </div>
+  </div>
+
+  <aside class="personbar closed">
+    <nav>
+      <div class="user-filter">Filters</div>
+      <div class="user-item" data-index = "-2">Select All</div>
+      <div class="user-choice">Users</div>
+      <div class="user-item" data-index = "5">Aaryan</div>
+      <div class="user-item" data-index = "9">Balaji</div>
+      <div class="user-item" data-index = "8">Bharat</div>
+      <div class="user-item" data-index = "4">Bipul</div>
+      <div class="user-item" data-index = "1">Chakri</div>
+      <div class="user-item" data-index = "6">Himanshu</div>
+      <div class="user-item" data-index = "3">Kshitij</div>
+      <div class="user-item" data-index = "2">Prachit</div>
+      <div class="user-item" data-index = "7">Safwan</div>
+      <div class="user-item" data-index = "0">Ujjwal</div>
     </nav>
   </aside>
-    <div class="content">
-      <div class="intro">
-        <h1>WhatsApp Wrapped</h1>
-        <p>Discover your WhatsApp usage analytics</p>
-        <p1>Click to explore your stats</p1>
-      </div>
-    </div>
-    <div id="emojiGraphContainer" class="emoji-graph hidden"></div>
+
+
+  <div class="chart-wrapper hidden chart-center">
+    <canvas id="myCanvas" class = "hidden"></canvas>
+  </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
