@@ -3,6 +3,7 @@
 # 1-> message count per user
 # 2-> word count per user
 # 6-> top 3 emojis per person
+# 18-> last 5 messages per person
 
 # Group-based statistics
 # 3-> most active sender between 12am-4am
@@ -25,6 +26,7 @@
 # 17-> peak active hour
 
 # Import useful libraries
+import sys
 import random
 import emoji
 import datetime
@@ -33,20 +35,21 @@ import os
 
 # File path for "chat.txt" and "data.json"
 file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-input_file_path = os.path.join(file_dir, "chat.txt")
+input_file_path = sys.argv[1]
 output_file_path = os.path.join(file_dir, "data.json")
 
-userData={}
-dayData={}
-wordData={}
-silenceTime=1800
-maxTimeGap=0
-messageCount=0
-prevMessageTime=None
-prevMessageDate=None
-prevMessageUser=None
-replyTime=[]
-activiy=[0,0,0,0,0,0]
+userData={}                 # Keeps record of entire user related data
+dayData={}                  # Keeps records of entire day related data
+wordData={}                 # Keeps record of entire word related data
+replyTime=[]                # Stores all the reply times for the group chat
+activiy=[0,0,0,0,0,0]       # Keeps record of total messages sent in (00:00, 03:59), (04:00, 07:59), (08:00, 11:59), (12:00, 15:59), (16:00, 19:59) and (20:00, 23:59) for the group chat
+
+silenceTime=1800            # Time gap longer than 1800 sec count as a long silence
+maxTimeGap=0                # Maximum value of time gap for the group chat
+messageCount=0              # Total message count for the group chat
+prevMessageTime=None        # Stores time of previous message
+prevMessageDate=None        # Stores date of previous message
+prevMessageUser=None        # Stores sender of previous message
 
 # Counts the total number of messages sent by the user
 def userMessageCount(messageUser):
@@ -123,7 +126,6 @@ def userReplyTime(messageUser, timeDifference, isReply):
 # Chaotic Day :- The date with maximum number of direct replies
 # Updates the total number of direct replies for the given date
 def chaoticDay(messageDate ,isReply):
-    #no need of checking presence of message date
     if isReply:
         if messageDate in dayData:
             dayData[messageDate][1]+=1
@@ -177,6 +179,11 @@ def userPeakActivity(messageUser, messageTime):
 def dayPeakActivity(messageTime):
     activiy[int(int(messageTime.split(":")[0])/4)]+=1
 
+# Updates the last message sent by the user
+def userMessage(messageUser, entireMessage):
+    userData[messageUser][18][int(userData[messageUser][18][5])]=entireMessage
+    userData[messageUser][18][5]=(int(1+userData[messageUser][18][5])%5)
+
 with open(input_file_path, 'r', encoding='utf-8') as file:
     for line in file:
         brokenLine1=line.strip().partition(",")
@@ -193,8 +200,9 @@ with open(input_file_path, 'r', encoding='utf-8') as file:
         timeDifference=0 if prevMessageTime==None else int((datetime.datetime.strptime(messageDate+" "+messageTime, "%d/%m/%y %H:%M")-datetime.datetime.strptime(prevMessageDate+" "+prevMessageTime, "%d/%m/%y %H:%M")).total_seconds())
         # Initialising new user in userData
         if messageUser not in userData:
-            userData[messageUser]=[0]*18
+            userData[messageUser]=[0]*19
             userData[messageUser][5]={}
+            userData[messageUser][18]=["","","","","",0]
 
         # Function calls to compute statistics 
         userMessageCount(messageUser)
@@ -215,6 +223,7 @@ with open(input_file_path, 'r', encoding='utf-8') as file:
         wordCount(message, messageTime)
         userPeakActivity(messageUser, messageTime)
         dayPeakActivity(messageTime)
+        userMessage(messageUser, f"{messageDate}, {messageTime}- {message}")
 
         # Updating "prev" variables
         messageCount+=1
@@ -227,7 +236,7 @@ for value in userData.values():
 
 # Preparing final_dict as per the below keyList for exporting as json 
 final_dict={}
-keyList=["userName","messageCount","wordCount","top3Emojis","nightOwl","ghost","silenceBreaker","fastReplier","longMessager","emojiUser","CAPSer","longWorder","top3BusyDay","top3ChaoticDay","longestSilence","medianReplyTime","top5Words","activity"]
+keyList=["userName","messageCount","wordCount","userActivity","last5Messages","top3Emojis","nightOwl","ghost","silenceBreaker","fastReplier","longMessager","emojiUser","CAPSer","longWorder","top3BusyDay","top3ChaoticDay","longestSilence","medianReplyTime","top5Words","activity"]
 
 for key in keyList:
     final_dict[key]=[]
@@ -236,6 +245,8 @@ for key, value in userData.items():
     final_dict["userName"].append(key)
     final_dict["messageCount"].append(value[0])
     final_dict["wordCount"].append(value[1])
+    final_dict["userActivity"].append([value[11], value[12], value[13], value[14], value[15], value[16]])
+    final_dict["last5Messages"].append([value[18][(i+value[18][5])%5] for i in range(5)])
     tmpEmojiList=[]
     emojiCnt=0
     for i, j in value[5].items():
