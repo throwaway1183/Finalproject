@@ -9,7 +9,9 @@
 \usepackage{hyperref}
 \usepackage{caption}
 \usepackage{listings}
+\usepackage{biblatex}
 
+\addbibresource{references.bib}
 
 \title{WhatsApp Wrapped}
 \author{
@@ -23,15 +25,27 @@
 
 \maketitle
 
+\newpage
+\begin{abstract}
+With the increasing use of instant messaging platforms, group chats have become a rich source of behavioral and interaction data. This project, \textit{WhatsApp Wrapped}, presents a system for simulating, analyzing, and visualizing group chat dynamics in an intuitive and engaging format inspired by “Spotify Wrapped.”
+
+The system consists of three main components: a chat generator, a statistics parser, and a web-based visualization interface. A synthetic chat dataset is first generated using a vocabulary-driven approach, where multiple users are modeled with distinct behavioral traits such as activity patterns, message lengths, and reply tendencies. This dataset is then processed by a parser that extracts a wide range of statistical insights, including user activity, response times, emoji usage, and temporal interaction patterns.
+
+The computed statistics are stored in a structured JSON format and subsequently visualized through an interactive frontend using modern web technologies. The project demonstrates how raw conversational data can be transformed into meaningful insights, providing an accessible way to understand communication patterns and group dynamics.
+
+Overall, the system highlights the integration of simulation, data processing, and visualization techniques to analyze messaging behavior in a scalable and extensible manner.
+\end{abstract}
+
+\newpage
 \tableofcontents
 \newpage
 
 \section{Introduction}
 With the rise of messaging platforms like WhatsApp, group chats have become an important part of daily communication. These chats contain interesting patterns, such as who talks the most, how quickly people reply, and when they are most active. Studying these patterns helps in understanding group behavior and individual roles within conversations.
 
-In this project, \textit{WhatsApp Wrapped}, we build a system that analyzes and visualizes these patterns in a format similar to Spotify Wrapped. First, a synthetic chat is generated using Python, where different users exhibit realistic behaviors such as varying activity levels and messaging styles. The generated chat is then analyzed to extract useful statistics about the group and its members.
+In this project, \textit{WhatsApp Wrapped}, we build a system that analyzes and visualizes these patterns in a format similar to Spotify Wrapped\cite{spotifywrapped}. First, a synthetic chat is generated using Python\cite{python}, where different users exhibit realistic behaviors such as varying activity levels and messaging styles. The generated chat is then analyzed to extract useful statistics about the group and its members.
 
-The results are stored in a JSON file and used by a browser-based application to create a slideshow of insights.
+The results are stored in a JSON\cite{json} file and used by a browser-based application to create a slideshow of insights.
 
 \newpage
 \section{System Design and Implementation}
@@ -47,7 +61,7 @@ The script \texttt{chat.py} processes this vocabulary to simulate a group chat a
     \item Reply streak patterns
 \end{itemize}
 
-The generated chat data is then processed by \texttt{analyze.py}, which computes statistical insights from \texttt{chat.txt} and outputs the results in JSON format.
+The generated chat data is then processed by \texttt{analyze.py}, which computes statistical insights from \texttt{chat.txt} and outputs the results in JSON\cite{json} format.
 
 This JSON data is subsequently consumed by a browser-based application, where the results are presented as an interactive slideshow of insights.
 
@@ -119,7 +133,7 @@ vocabulary.txt $\rightarrow$ chat.py $\rightarrow$ chat.txt $\rightarrow$ analyz
 \subsection{Chat Generation Module}
 \begin{itemize}
 \item Requires a text file with comma-separated words which will be used to generate the simulated group chat. In this project we use \texttt{vocabulary.txt} 
-\item The output strictly follows the following format\\ 
+\item The output strictly follows the following format\cite{whatsappformat}\\ 
 \texttt{DD/MM/YY, HH:MM - Sender\_Name: Message text}
 
 \begin{verbatim}
@@ -175,7 +189,7 @@ Usage:
 
 \subsection{Modules Imported}
 \begin{itemize}
-    \item \texttt{numpy}
+    \item \texttt{numpy}\cite{numpy}
     \begin{itemize}
         \item Used for numerical operations and efficient handling of data.
     \end{itemize}
@@ -439,6 +453,7 @@ Usage:
     \end{itemize}
 
     \item All definitions are designed to be simple, consistent, and computationally efficient, while still capturing meaningful conversational behavior from raw chat data.
+    \item Many decisions related to finalizing the exact numbers took inspiration from \emph{SSL with TAs} WhatsApp group. We took a rough analysis of chats and measured time gaps, direct replies and inactivity periods as a rough estimate.
 \end{itemize}
 
 \subsection{Modules Imported}
@@ -448,7 +463,7 @@ Usage:
         \item Used for probabilistic modeling of reply behaviour (e.g., random direct reply assignment).
     \end{itemize}
 
-    \item \texttt{emoji}
+    \item \texttt{emoji}\cite{emoji}
     \begin{itemize}
         \item Used to detect and process emojis in messages.
         \item Enables computation of emoji-based statistics.
@@ -471,5 +486,253 @@ Usage:
         \item Used for handling file paths and ensuring correct input/output file access.
     \end{itemize}
 \end{itemize}
+
+\newpage
+
+\section{The Wrapped Experience}
+
+\subsection{Overview}
+The final component of the system is a browser-based interactive slideshow that presents the analyzed chat statistics in an engaging and visually appealing format. Inspired by the “Spotify Wrapped”\cite{spotifywrapped} experience, the interface is designed to be immersive, intuitive, and user-driven, allowing users to explore insights through sequential navigation and interactive controls.
+
+The frontend consumes data exclusively from \texttt{data.json}, ensuring a clean separation between data processing and presentation. All visual elements, animations, and interactions are implemented using HTML, CSS, and JavaScript \cite{html,css,javascript}.
+
+\subsection{User Interface Design}
+The web interface consists of a full-screen layout with three primary components:
+\begin{itemize}
+\item A central \textbf{content area} for displaying slides and visualizations
+\item A collapsible \textbf{sidebar} for navigating between different statistics
+\item A \textbf{person filter panel} for selecting specific users in per-person views
+\end{itemize}
+
+The layout is implemented using flexible containers and dynamic visibility control, allowing seamless transitions between different types of content. The navigation structure mirrors the categorization of statistics into user-based, group-based, and time-based insights.
+
+\subsection{Slide-Based Navigation}
+The application follows a slideshow paradigm where each statistic is represented as an individual slide. Users can navigate through slides using:
+\begin{itemize}
+\item Click-based progression for a linear experience
+\item Sidebar navigation for direct access to specific statistics
+\end{itemize}
+
+Each slide dynamically updates the displayed content, ensuring that only relevant components (text, charts, or profile cards) are visible at any given time. This design avoids clutter and maintains focus on the currently displayed insight.
+
+\subsection{Data Visualization}
+Statistical data is visualized using interactive charts rendered via \texttt{Chart.js} \cite{chartjs}. Depending on the nature of the statistic, different chart types are used, including:
+\begin{itemize}
+\item Bar charts for message counts, word counts, and activity distributions
+\item Line charts for activity head map in per-person view
+\end{itemize}
+
+The chart canvas is dynamically shown or hidden based on the active slide, ensuring efficient rendering and a consistent visual layout.
+
+\subsection{Animated Background Experience}
+To enhance visual engagement, the application incorporates a multi-layered animated background using looping video elements \cite{videohtml,codepen_bg}. Multiple background videos are preloaded and controlled programmatically to simulate smooth transitions between scenes.
+
+Only one video is visible at a time, while others remain hidden with adjusted opacity. Transitions are synchronized with user interactions, creating a fluid and immersive experience without rendering delays or visual artifacts.
+
+\subsection{Interactive Navigation Panels}
+The sidebar provides structured navigation across different categories of statistics, enabling users to jump directly to specific insights. Each navigation item is mapped to a slide index, allowing efficient state management within the application.
+
+\subsection{Per-Person Profile View}
+A dedicated per-person view presents individual statistics in a card-based layout. Each profile card includes:
+\begin{itemize}
+\item Total messages
+\item Total word count
+\item Emoji usage statistics
+\item Activity heat map as a line chart
+\end{itemize}
+
+The cards are dynamically generated and arranged in a responsive grid, allowing multiple profiles to be viewed simultaneously. This design ensures both scalability and visual consistency.\\
+\\
+Additionally, a secondary panel (person filter bar) allows users to:
+\begin{itemize}
+\item Select individual users
+\item View multiple users simultaneously
+\item Filter per-person statistics dynamically
+\end{itemize}
+
+This functionality supports comparative analysis and enhances user control over the displayed data.
+\subsection{Styling and Visual Design}
+The visual design emphasizes readability and immersion through:
+\begin{itemize}
+\item Dark-themed UI with high-contrast text
+\item Smooth transitions and fade-in animations
+\item Responsive layout with flexible containers
+\end{itemize}
+
+Styling is implemented using CSS\cite{css}, with careful handling of layering, positioning, and visibility to ensure that only relevant elements are displayed at any time .
+
+\subsection{Summary}
+Overall, the Wrapped Experience transforms raw statistical output into an engaging narrative-driven interface. By combining interactive navigation, dynamic visualization, and immersive design elements, the frontend provides an intuitive way to explore and interpret complex chat data.
+
+
+
+
+
+\section{Hurdles Faced and How They Were Overcome}
+
+\subsection{Chat Generation Challenges (\texttt{chat.py})}
+
+\subsubsection{Designing realistic chat behavior}
+\begin{itemize}
+\item A major challenge was generating synthetic chat data that did not appear artificial or overly uniform.
+\item To address this, we introduced stochastic behavior using the \texttt{random} module to vary:
+\begin{itemize}
+    \item message frequency
+    \item message length
+    \item time gaps between messages
+    \item reply streak patterns
+\end{itemize}
+\item This ensured non-deterministic execution, resulting in more natural and human-like interaction patterns.
+\end{itemize}
+
+\subsubsection{Developing user personalities}
+\begin{itemize}
+\item Ensuring that each user exhibited distinct and recognizable behavior was non-trivial.
+\item This was addressed by assigning different behavioral tendencies to users, such as variations in activity levels, preferred message lengths, and interaction styles.
+\item Consequently, the generated chat reflects diverse participation patterns similar to real-world group dynamics.
+\end{itemize}
+
+\subsubsection{Maintaining chronological consistency}
+\begin{itemize}
+\item While introducing variable time gaps, maintaining strictly increasing timestamps was challenging.
+\item We resolved this using the \texttt{datetime} module to increment time deterministically and handle day transitions correctly.
+\item This guaranteed chronological consistency throughout the generated chat.
+\end{itemize}
+
+\subsection{Statistics Parsing Challenges (\texttt{analyze.py})}
+
+\subsubsection{Choosing parameter values for definitions}
+\begin{itemize}
+\item Defining concepts such as replies, silence, and activity thresholds required careful parameter selection.
+\item We experimented with multiple values, looked at WhatsApp groups, and finalized thresholds (e.g., 600 seconds for quick replies and 1800 seconds for silence) that produced realistic and interpretable results.
+\end{itemize}
+
+\subsubsection{Defining what constitutes a word}
+\begin{itemize}
+\item Messages contained a mix of alphabets, numbers, and symbols, making naive tokenization unreliable.
+\item We defined a word as any token containing at least one alphabetic character, effectively filtering out noise.
+\end{itemize}
+
+\subsubsection{Modeling replies and silence}
+\begin{itemize}
+\item Since chat data does not explicitly encode reply relationships, identifying replies was inherently ambiguous.
+\item We approximated this using a combination of:
+\begin{itemize}
+    \item change of sender
+    \item time-based thresholds
+    \item probabilistic modeling for delayed responses
+\end{itemize}
+\item Silence periods were similarly identified using a fixed time threshold.
+\end{itemize}
+
+\subsubsection{Handling emojis}
+\begin{itemize}
+\item Emojis, being Unicode characters, cannot be reliably processed using standard string operations.
+\item We used the \texttt{emoji} library to accurately detect and count emojis in messages.
+\end{itemize}
+
+\subsubsection{Defining chaotic and busy days}
+\begin{itemize}
+\item Distinguishing between message volume and interaction intensity required separate metrics.
+\item We defined busy days based on total message count and chaotic days based on the number of direct replies.
+\end{itemize}
+
+\subsubsection{Word normalization for frequency analysis}
+\begin{itemize}
+\item Variations in letter casing led to inconsistencies in word frequency counts.
+\item We normalized all tokens to lowercase prior to aggregation.
+\end{itemize}
+
+\subsubsection{Managing sequential dependencies}
+\begin{itemize}
+\item Several metrics depend on relationships between consecutive messages.
+\item We maintained state variables such as the previous sender and timestamp to enable efficient single-pass computation.
+\end{itemize}
+
+\subsubsection{Structuring \texttt{data.json}}
+\begin{itemize}
+\item Organizing diverse statistics for efficient frontend consumption was challenging.
+\item We designed a structured schema using dictionaries and arrays, ensuring consistency, minimal redundancy, and fast access during visualization.
+\end{itemize}
+
+\subsection{The Wrapped Browser Experience \texttt{app.js}}
+\subsubsection{Background Animation}
+\begin{itemize}
+    \item We aimed to implement an animated background similar to the Spotify Wrapped experience to enhance visual engagement.
+    
+    \item The design involved a sequence of four animations played in a continuous loop, with transitions synchronized to user interactions (click events).
+    
+    \item A key challenge was ensuring seamless transitions between animations. Without preloading, switching between videos resulted in visual artifacts such as white flashes or occasional failure to render the next animation.
+    
+    \item This issue was resolved by preloading all animation videos at their initial frame. When transitioning:
+    \begin{itemize}
+        \item the next animation is immediately played,
+        \item the current animation is hidden,
+        \item and its playback position is reset to the beginning and paused.
+    \end{itemize}
+    
+    \item This approach effectively simulates preloaded media, ensuring smooth, uninterrupted transitions between animations.
+\end{itemize}
+
+\subsubsection{Incomplete Sidebar on Slide 17}
+\begin{itemize}
+    \item By default, the sidebar height is set to \texttt{100vh}, with the \texttt{overflow-y} property enabled to allow users to scroll through available statistics.
+    
+    \item A challenge arose on slide 17 (Per Person Statistics), where the content often exceeded the viewport height due to multiple profile cards being rendered. This caused the sidebar and profile selector to appear truncated or partially inaccessible.
+    
+    \item To address this, we dynamically modified the height property when slide 17 is active, allowing it to expand beyond \texttt{100vh}. The original height setting is restored when navigating away from this slide.
+\end{itemize}
+
+\subsubsection{Invisible Padding}
+\begin{itemize}
+\item The main HTML structure consists of separate containers: a \texttt{content} div for slide information, a container for per-person profile cards, and a canvas element for rendering charts using \texttt{Chart.js}.
+    
+\item This separation was necessary to provide clearly identifiable elements for dynamic content insertion via JavaScript \cite{javascript,dom}.
+    
+\item However, this design introduced unintended layout issues, where inactive containers still occupied space, resulting in invisible padded regions on the screen.
+    
+\item To resolve this, we conditionally applied a \texttt{hidden} class to elements that were not required for the current slide. This ensured that only relevant components were rendered, eliminating unwanted spacing.
+\end{itemize}
+
+\section{What we would do differently with 10 more hours}
+\subsection{Proposed Enhancements with Additional Development Time}
+
+Given an additional 10 hours of development, we would extend the project with the following features:
+
+\begin{itemize}
+
+\item \textbf{Digital Friend Assignment:}
+\begin{itemize}
+    \item We would design a feature to assign each user a ``digital friend'' based on interaction patterns in the group chat.
+    \item This would involve analyzing reply frequency, mutual interactions, and conversational proximity between users.
+    \item The goal is to identify pairs of users who interact most frequently or meaningfully, thereby capturing implicit social bonds within the group.
+\end{itemize}
+
+\item \textbf{Website Feedback Section:}
+\begin{itemize}
+    \item A feedback module would be integrated into the web interface to collect user responses and suggestions.
+    \item This would allow users to provide input on usability, visualization quality, and feature requests.
+    \item The collected feedback could be stored and analyzed to guide future improvements.
+\end{itemize}
+
+\item \textbf{Read-Aloud Feature:}
+\begin{itemize}
+    \item We would incorporate a text-to-speech (TTS) system to read out key statistics and insights.
+    \item This would enhance accessibility and improve user engagement, especially in the slideshow format.
+    \item The feature could be implemented using browser-based speech APIs for seamless integration.
+\end{itemize}
+
+\item \textbf{Personalized User Cards:}
+\begin{itemize}
+    \item Each user would be represented by a dynamically generated profile card which will be used for summarizing their personality and chat behavior in per-person statistics section
+    \item These cards would visually encode depending on paramters like activity level, emoji usage, response speed, and messaging style.
+    \item The aim is to provide an intuitive and visually appealing summary of individual user characteristics.
+\end{itemize}
+
+\end{itemize}
+
+\section{Bibliography}
+
+\printbibliography
 
 \end{document}
