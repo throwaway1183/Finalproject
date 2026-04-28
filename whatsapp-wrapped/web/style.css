@@ -12,6 +12,15 @@
   background: transparent;
 }
 
+#top-title{
+  cursor: pointer;
+}
+#user-toggle-title{
+  padding-left: 67%;
+  font-size: medium;
+  display: none;
+}
+
 #bgVideo0 {
   position: fixed;
   top: 0;
