@@ -19,7 +19,7 @@ const profilesContainer = document.getElementById("profileContainer");
 let data = []; // global variable to hold data
 
 async function loadData() {
-  const response = await fetch("./data.json");
+  const response = await fetch("../data.json");
   return await response.json();
 }
 
@@ -54,7 +54,8 @@ async function init() {
     `<h1>The CAPS User</h1><p>${cdata.CAPSer[0][0]} : LOVES SHOUTING 😤</p>`,               
     `<h1>Long Worder</h1><p>${cdata.longWorder[0][0]} : longest average word length 📚</p>`,   
     `<h1>Long Messenger</h1><p>${cdata.longMessager[0][0]} : longest messages ✍️</p>`,           
-    `<h1>Emoji Man</h1><p>${cdata.emojiUser[0][0]} : most emojis used 😂🔥💀</p>`,                          
+    `<h1>Emoji Man</h1><p>${cdata.emojiUser[0][0]} : most emojis used 😂🔥💀</p>`,
+    `<h1>Most Common Word</h1><p>"${cdata.top5Words[0][0][0]}" (used ${cdata.top5Words[0][0][1]} times)</p>`,                           
     //time stats
     `<h1>Busiest Day</h1><p>${cdata.top3BusyDay[0][0]} : ${cdata.top3BusyDay[0][1]} messages 📈</p>`,              
     `<h1>Longest Silence</h1><p>${Math.floor(cdata.longestSilence / 3600)} hours 😶</p>`,                    
@@ -76,7 +77,10 @@ navItems.forEach(item => {
   })
 });
 
-
+let title = document.getElementById("top-title");
+  title.addEventListener('click', () => {
+    window.location.reload();
+  });
 let curvid = 0;
 let numvid = 4;
 
@@ -271,6 +275,8 @@ function renderEmojiChart() {
   });
 }
 
+const userTogTitle = document.getElementById("user-toggle-title");
+
 //slide loader logic with video background transition
 function showSlide(index){
   console.log("showSlide:", index);
@@ -287,6 +293,7 @@ function showSlide(index){
   nextVid.style.zIndex = -1;
   prevVid.style.opacity = 0;
   prevVid.style.zIndex = -2;
+  userTogTitle.style.display = "none";
   if (prevVid.readyState >= 1) {
     prevVid.currentTime = 0;
   }
@@ -323,6 +330,7 @@ function showSlide(index){
     wrapper.style.zIndex = 0;
     renderEmojiChart();
   } else if(index === 17){
+    userTogTitle.style.display = "block";
     wrapper.style.flex = "0 0 0%";
     wrapper.style.display = 'none';
     wrapper.style.zIndex = -3;
@@ -428,6 +436,9 @@ personToggle.addEventListener("click", () => {
 });
 
 let selectedUsers = new Set();
+for(let i = 0; i < 10; i++){
+  selectedUsers.add(i);
+}
 
 const userItems = document.querySelectorAll('.user-item');
 userItems.forEach(item => {
